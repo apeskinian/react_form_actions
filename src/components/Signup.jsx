@@ -1,8 +1,10 @@
-import { useActionState } from "react";
+import { useActionState, useRef } from "react";
 
 import { isEmail, isNotEmpty, isEqualToOtherValue, hasMinLength } from "../util/validation";
 
 export default function Signup() {
+  const dataForm = useRef();
+
   function signupAction(prevFormState, formData) {
     const email = formData.get('email');
     const password = formData.get('password');
@@ -56,8 +58,20 @@ export default function Signup() {
 
   const [ formState, formAction ] = useActionState(signupAction, { errors: null });
 
+  function manualFormReset() {
+    const form = dataForm.current;
+    form.email.value = '';
+    form.password.value = '';
+    form['confirm-password'].value = '';
+    form['first-name'].value = '';
+    form['last-name'].value = '';
+    form.role.selectedIndex = 0;
+    form.querySelectorAll('input[name="acquisition"]').forEach(cb => cb.checked = false);
+    form['terms-and-conditions'].checked = false
+  }
+
   return (
-    <form action={formAction}>
+    <form action={formAction} ref={dataForm}>
       <h2>Welcome on board!</h2>
       <p>We just need a little bit of data from you to get you started 🚀</p>
 
@@ -189,7 +203,7 @@ export default function Signup() {
       )}
 
       <p className="form-actions">
-        <button type="reset" className="button button-flat">
+        <button type="button" className="button button-flat" onClick={manualFormReset}>
           Reset
         </button>
         <button className="button">Sign up</button>
