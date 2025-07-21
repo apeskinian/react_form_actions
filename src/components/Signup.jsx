@@ -1,60 +1,59 @@
 import { useActionState, useRef } from "react";
-
 import { isEmail, isNotEmpty, isEqualToOtherValue, hasMinLength } from "../util/validation";
+
+function signupAction(prevFormState, formData) {
+  const email = formData.get('email');
+  const password = formData.get('password');
+  const confirmPassword = formData.get('confirm-password');
+  const firstName = formData.get('first-name');
+  const lastName = formData.get('last-name');
+  const role = formData.get('role');
+  const terms = formData.get('terms');
+  // use getAll to get all elements with the same name in an array
+  const acquisitionChannel = formData.getAll('acquisition');
+
+  let errors = [];
+
+  if (!isEmail(email)) {
+    errors.push('Invalid email address.');
+  }
+  if (!isNotEmpty(password) || !hasMinLength(password, 6)) {
+    errors.push('You must provide a password with at least 6 characters.')
+  }
+  if (!isEqualToOtherValue(password, confirmPassword)) {
+    errors.push('Passwords do not match.')
+  }
+  if (!isNotEmpty(firstName) || !isNotEmpty(lastName)) {
+    errors.push('Please provide first and last name.')
+  }
+  if (!isNotEmpty(role)) {
+    errors.push('Please select a role.')
+  }
+  if (!terms) {
+    errors.push('You must agree to the terms and conditions.')
+  }
+  if (acquisitionChannel.length === 0) {
+    errors.push('Please select at least one acquisition channel.')
+  }
+
+  if (errors.length > 0) {
+    return { errors, enteredValues: {
+      email,
+      password,
+      confirmPassword,
+      firstName,
+      lastName,
+      role,
+      acquisitionChannel,
+      terms,
+    } };
+  }
+
+  return { errors : null };
+}
 
 export default function Signup() {
   const dataForm = useRef();
-
-  function signupAction(prevFormState, formData) {
-    const email = formData.get('email');
-    const password = formData.get('password');
-    const confirmPassword = formData.get('confirm-password');
-    const firstName = formData.get('first-name');
-    const lastName = formData.get('last-name');
-    const role = formData.get('role');
-    const terms = formData.get('terms');
-    // use getAll to get all elements with the same name in an array
-    const acquisitionChannel = formData.getAll('acquisition');
-
-    let errors = [];
-
-    if (!isEmail(email)) {
-      errors.push('Invalid email address.');
-    }
-    if (!isNotEmpty(password) || !hasMinLength(password, 6)) {
-      errors.push('You must provide a password with at least 6 characters.')
-    }
-    if (!isEqualToOtherValue(password, confirmPassword)) {
-      errors.push('Passwords do not match.')
-    }
-    if (!isNotEmpty(firstName) || !isNotEmpty(lastName)) {
-      errors.push('Please provide first and last name.')
-    }
-    if (!isNotEmpty(role)) {
-      errors.push('Please select a role.')
-    }
-    if (!terms) {
-      errors.push('You must agree to the terms and conditions.')
-    }
-    if (acquisitionChannel.length === 0) {
-      errors.push('Please select at least one acquisition channel.')
-    }
-
-    if (errors.length > 0) {
-      return { errors, enteredValues: {
-        email,
-        password,
-        confirmPassword,
-        firstName,
-        lastName,
-        role,
-        acquisitionChannel,
-        terms,
-      } };
-    }
-
-    return { errors : null }
-  }
 
   const [ formState, formAction ] = useActionState(signupAction, { errors: null });
 
